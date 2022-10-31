@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.TextUtils;
@@ -43,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements EmpaDataDelegate,
     private static final int REQUEST_PERMISSION_ACCESS_COARSE_LOCATION = 1;
 
 
-    private static final String EMPATICA_API_KEY = ""; // TODO insert your API Key here
+    private static final String EMPATICA_API_KEY = "b260b4ba52a64226aebc27d9515f1510"; // TODO insert your API Key here
 
 
     private EmpaDeviceManager deviceManager = null;
@@ -215,7 +216,7 @@ public class MainActivity extends AppCompatActivity implements EmpaDataDelegate,
         // the device is not linked with your API key. Please check your developer area at
         // https://www.empatica.com/connect/developer.php
 
-        Log.i(TAG, "didDiscoverDevice" + deviceName + "allowed: " + allowed);
+        Log.i(TAG, "didDiscoverDevice [" + deviceName + "] allowed: [" + allowed+ "]");
 
         if (allowed) {
             // Stop scanning. The first allowed device will do.
@@ -294,6 +295,23 @@ public class MainActivity extends AppCompatActivity implements EmpaDataDelegate,
         // Update the UI
         updateLabel(statusLabel, status.name());
 
+        // Obtener permisos
+        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_DENIED)
+        {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+            {
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 2);
+                return;
+            }
+        }
+        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_DENIED)
+        {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+            {
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.BLUETOOTH_SCAN}, 2);
+                return;
+            }
+        }
         // The device manager is ready for use
         if (status == EmpaStatus.READY) {
             updateLabel(statusLabel, status.name() + " - Turn on your device");
